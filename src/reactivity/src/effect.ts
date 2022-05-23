@@ -9,6 +9,9 @@ const bucket = new WeakMap()
 // 当前激活的 effect 函数
 let activeEffect: any
 
+// 副作用函数栈
+const effectStack = <any>[]
+
 // 在 get 拦截函数内调用 track 函数追踪变化
 export function track(target: object, key: unknown) {
   if (!activeEffect)
@@ -32,17 +35,18 @@ export function trigger(target: object, key: unknown) {
   if (!depsMap)
     return
   const effects = depsMap.get(key)
-  const effectToRun = new Set(effects)
-  // effects && effects.forEach((effectFn: any) => {
-  //   // 如果 trigger 触发执行的 effect 与当前正在执行的 activeEffect 相同，则不再执行
-  //   if (effectFn !== activeEffect)
-  //     effectToRun.add(effectFn)
-  // })
+
+  const effectToRun = new Set()
+  effects && effects.forEach((effectFn: any) => {
+    // 如果 trigger 触发执行的 effect 与当前正在执行的 activeEffect 相同，则不再执行
+    if (effectFn !== activeEffect)
+      effectToRun.add(effectFn)
+  })
   effectToRun.forEach((fn: any) => {
-    // if (fn.options.scheduler)
-    //   fn.options.scheduler(fn)
-    // else
-    fn()
+    if (fn.options.scheduler)
+      fn.options.scheduler(fn)
+    else
+      fn()
   })
 }
 
@@ -54,12 +58,19 @@ export function cleanup(effectFn: any) {
   effectFn.deps.length = 0
 }
 // options?: EffectOptions
-export function effect(fn: () => void) {
+export function effect(fn: () => void, options: object = {}) {
   const effectFn = () => {
     cleanup(effectFn)
+    // 在调用 effect 注册副作用函数时， 将副作用函数赋值给 activeEffect
     activeEffect = effectFn
+    // 在调用副作用函数之前将当前副作用函数压入栈
+    effectStack.push(effectFn)
     fn()
+    // 在当前副作用函数执行完毕后，将当前副作用函数从栈中弹出，并把 activeEffect 还原为之前的值
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   }
+  effectFn.options = options
   effectFn.deps = <any>[]
   effectFn()
 }
