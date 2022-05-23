@@ -1,7 +1,7 @@
-// interface EffectOptions {
-//   scheduler?: () => void
-//   lazy?: boolean
-// }
+interface EffectOptions {
+  scheduler?: () => void
+  lazy?: boolean
+}
 
 // 全局依赖收集对象
 const bucket = new WeakMap()
@@ -58,19 +58,22 @@ export function cleanup(effectFn: any) {
   effectFn.deps.length = 0
 }
 // options?: EffectOptions
-export function effect(fn: () => void, options: object = {}) {
+export function effect(fn: () => void, options: EffectOptions = {}) {
   const effectFn = () => {
     cleanup(effectFn)
     // 在调用 effect 注册副作用函数时， 将副作用函数赋值给 activeEffect
     activeEffect = effectFn
     // 在调用副作用函数之前将当前副作用函数压入栈
     effectStack.push(effectFn)
-    fn()
+    const res = fn()
     // 在当前副作用函数执行完毕后，将当前副作用函数从栈中弹出，并把 activeEffect 还原为之前的值
     effectStack.pop()
     activeEffect = effectStack[effectStack.length - 1]
+    return res
   }
   effectFn.options = options
   effectFn.deps = <any>[]
-  effectFn()
+  if (!options.lazy)
+    effectFn()
+  return effectFn
 }
