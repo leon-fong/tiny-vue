@@ -9,10 +9,11 @@ describe('computed', () => {
     expect(sumRes.value).toBe(3)
   })
 
-  // it('should be get a value', () => {
-  //   const counter = reactive({ num1: 1, num2: 2 })
-  //   const sumRes = computed(() => counter.num1 + counter.num2)
-  //   counter.num1++
-  //   expect(sumRes.value).toBe(5)
-  // })
+  it('counter has been change , sumRes.value will be change', () => {
+    const counter = reactive({ num1: 1, num2: 2 })
+    const sumRes = computed(() => counter.num1 + counter.num2)
+    console.log(sumRes.value)
+    counter.num1++
+    expect(sumRes.value).toBe(4)
+  })
 })

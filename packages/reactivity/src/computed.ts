@@ -5,6 +5,9 @@ export function computed(getter: any) {
   let dirty = true
   const effectFn = effect(getter, {
     lazy: true,
+    scheduler() {
+      dirty = true
+    },
   })
 
   const obj = {
