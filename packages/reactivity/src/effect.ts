@@ -57,7 +57,7 @@ export function cleanup(effectFn: any) {
   }
   effectFn.deps.length = 0
 }
-// options?: EffectOptions
+
 export function effect(fn: () => void, options: EffectOptions = {}) {
   const effectFn = () => {
     cleanup(effectFn)
