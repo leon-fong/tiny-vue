@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "vitest",
+    "preinstall": "npx only-allow pnpm",
+    "test": "vitest packages/",
     "build": "rollup -c rollup.config.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

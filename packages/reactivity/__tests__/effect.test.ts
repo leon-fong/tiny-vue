@@ -18,4 +18,12 @@ describe('effect', () => {
     counter.num = 1
     expect(dummy).toBe(1)
   })
+
+  it('should avoid be show Maximum call stack size exceeded', () => {
+    const counter = reactive({ num: 0 })
+    effect(() => {
+      counter.num++
+    })
+    expect(counter.num).toBe(1)
+  })
 })
