@@ -23,7 +23,13 @@ describe('watch', () => {
     expect(viFn).toHaveBeenCalled()
   })
 
-  it.todo('cb has two params', () => {
-    // Todo
+  it('cb has two params', () => {
+    const obj = reactive({
+      num: 1,
+    })
+    const viFn = vi.fn((oldValue, newValue) => { console.log('change------', oldValue, newValue) })
+    watch(() => obj.num, viFn)
+    obj.num++
+    expect(viFn).toHaveBeenCalledWith(1, 2)
   })
 })
