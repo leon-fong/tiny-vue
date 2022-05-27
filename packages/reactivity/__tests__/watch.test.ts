@@ -7,7 +7,7 @@ describe('watch', () => {
     const obj = reactive({
       foo: 1,
     })
-    const viFn = vi.fn(() => { console.log('change------') })
+    const viFn = vi.fn(() => { })
     watch(obj, viFn)
     obj.foo = 2
     expect(viFn).toHaveBeenCalled()
@@ -17,7 +17,7 @@ describe('watch', () => {
     const obj = reactive({
       foo: 1,
     })
-    const viFn = vi.fn(() => { console.log('change------') })
+    const viFn = vi.fn(() => { })
     watch(() => obj.foo, viFn)
     obj.foo = 2
     expect(viFn).toHaveBeenCalled()
@@ -27,9 +27,19 @@ describe('watch', () => {
     const obj = reactive({
       num: 1,
     })
-    const viFn = vi.fn((oldValue, newValue) => { console.log('change------', oldValue, newValue) })
+    const viFn = vi.fn((oldValue, newValue) => { return { oldValue, newValue } })
     watch(() => obj.num, viFn)
     obj.num++
     expect(viFn).toHaveBeenCalledWith(1, 2)
+  })
+
+  it('immediate', () => {
+    const obj = reactive({
+      num: 1,
+    })
+    const viFn = vi.fn((oldValue, newValue) => { return { oldValue, newValue } })
+    watch(() => obj.num, viFn, { immediate: true })
+    expect(viFn).toHaveBeenCalled()
+    expect(viFn).toHaveBeenCalledWith(undefined, 1)
   })
 })
